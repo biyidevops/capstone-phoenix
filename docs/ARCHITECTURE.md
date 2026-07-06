@@ -144,16 +144,26 @@ Kanban board all confirmed working through the browser over HTTPS.
 - Certificate `taskapp-tls` issued and verified: `READY=True`,
   `curl -vI` confirms valid chain, correct SAN, HTTP/2 200 response
 
-## Still pending
+## Advanced Requirements
 
-- Argo CD (GitOps) — not yet installed; all changes so far applied via
-  `kubectl apply` and will need to be committed to git first
-- HPA, PodDisruptionBudget, NetworkPolicy, securityContext hardening
-- Observability (Prometheus/Grafana)
-- Zero-downtime rollout proof, failover/drain demo
-- EVIDENCE screenshots
+| Requirement | Status | Evidence |
+|-------------|--------|----------|
+| HPA (backend, CPU 50%, min 2 max 6) | ✅ Proven — scaled 2→6 under load | HPA_Active.png |
+| PodDisruptionBudget (minAvailable: 1, both tiers) | ✅ Proven — node drain respected PDB | kubectl_drain_terminal.png |
+| Observability (Grafana + metrics-server) | ✅ Running in monitoring namespace | Grafana_dashboard.png |
+| NetworkPolicy (default-deny + explicit allows) | ✅ Applied — Flannel does not enforce; would be enforced with Cilium/Calico CNI swap | NetworkPolicy rules applied |
+| GitOps (Argo CD) | ✅ Installed, syncing manifests/main, auto-sync confirmed | argo_cd_dashboard.png |
+| securityContext hardening | ✅ runAsNonRoot, readOnlyRootFilesystem, drop ALL caps, RuntimeDefault seccomp | Applied to all workloads |
 
-## Cost
+### NetworkPolicy — CNI enforcement note
 
-See `docs/COST.md` (to be completed) — 3 × t3.medium in eu-north-1 plus one
-Elastic IP, running for the duration of the capstone build/demo window.
+NetworkPolicy manifests are present in `manifests/11-networkpolicy.yaml` with correct rules:
+default-deny ingress in taskapp namespace, explicit allows for ingress→frontend,
+frontend→backend (port 5000), backend→postgres (port 5432), monitoring→backend.
+Flannel (vxlan) does not enforce these at the kernel level. To enforce:
+
+    helm install cilium cilium/cilium --namespace kube-system \
+      --set operator.replicas=1 --set kubeProxyReplacement=false
+
+After Cilium replaces Flannel, the existing NetworkPolicy objects enforce immediately
+with no manifest changes needed.
