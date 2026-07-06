@@ -8,4 +8,3 @@ data:
   DATABASE_PORT: "5432"
   DATABASE_NAME: "taskapp"
   API_URL: "https://taskapp.techproconsults.com/api"
-  GITOPS_TEST: "proof-this-syncs-automatically"
