@@ -10,3 +10,10 @@ Drop screenshots/logs here, named so a grader knows what each proves:
 - `hpa-scale.png` — replicas climbing under load
 - `argocd-synced.png` — Argo CD Synced + Healthy
 - `failover.png` — app up after a node drain
+
+## Live Demo Recording
+
+https://drive.google.com/file/d/1q4HW6HsDUTkFy8B0OBbQT6KUkcdvbp_N/view?usp=sharing
+
+
+Shows: taskapp.techproconsults.com live over HTTPS, login, task creation, Kanban board.
