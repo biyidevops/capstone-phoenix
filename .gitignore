@@ -31,3 +31,4 @@ charts/*.tgz
 *.swp
 .idea/
 .vscode/
+*.mp4
